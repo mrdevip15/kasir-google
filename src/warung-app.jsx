@@ -670,10 +670,18 @@ const styles = `
   }
   .gdrivewrapper iframe {
     border: 0;
-    position: relative;
-    z-index: 2;
+    position: absolute;
+    top: -50px;
+    left: 0;
     width: 100%;
-    height: 100%;
+    height: calc(100% + 100px);
+    z-index: 2;
+  }
+  .gdrive-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    background: transparent;
   }
   .gdrivewrapper a {
     color: rgba(0,0,0,0);
@@ -896,7 +904,7 @@ export default function WarungApp() {
                               mozallowfullscreen="true"
                               webkitallowfullscreen="true"
                             ></iframe>
-                            <a href="https://dodsafe.org">dod safe</a>
+                            <div className="gdrive-overlay" />
                             {item.width && item.height && (
                               <div className="img-dim">{item.width} × {item.height}</div>
                             )}
