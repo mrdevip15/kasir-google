@@ -172,31 +172,48 @@ const styles = `
 
   .menu-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, 640px);
+    gap: 24px;
+    justify-content: center;
   }
 
   .menu-card {
     background: #fff;
-    border-radius: 16px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 2px 12px rgba(61,26,0,0.08);
+    box-shadow: 0 4px 20px rgba(61,26,0,0.1);
     transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
     border: 1.5px solid #f0e4d0;
+    width: 640px;
   }
   .menu-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(61,26,0,0.14);
   }
   .card-emoji {
-    height: 90px;
+    width: 640px;
+    height: 640px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 46px;
+    font-size: 64px;
     background: linear-gradient(135deg, #fff8f0, #fdebd0);
     position: relative;
+    overflow: hidden;
+  }
+
+  .img-dim {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    z-index: 10;
+    pointer-events: none;
   }
   .card-body { padding: 10px 12px 12px; }
   .card-name {
@@ -642,6 +659,29 @@ const styles = `
   .empty-cart-icon { font-size: 48px; margin-bottom: 8px; }
   .empty-cart-text { font-size: 14px; }
   .loading { text-align: center; padding: 40px; color: #c9956a; font-size: 14px; }
+
+  /* GDRIVE WRAPPER */
+  .gdrivewrapper {
+    background: #fff;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  .gdrivewrapper iframe {
+    border: 0;
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+  }
+  .gdrivewrapper a {
+    color: rgba(0,0,0,0);
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 0;
+  }
 `;
 
 // ─── MAIN APP ────────────────────────────────────────────────────────────────
@@ -657,19 +697,37 @@ export default function WarungApp() {
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [customer, setCustomer] = useState({ name: "", table: "" });
-  const [useSheet, setUseSheet] = useState(false);
-  const [sheetId, setSheetId] = useState("");
+  const [useSheet, setUseSheet] = useState(true);
+  const [sheetId, setSheetId] = useState("1DKh_6dm4osC48kVAsmaGyY68NaiWIDqvC7SwCQ7LdpY");
   const [sheetName, setSheetName] = useState("Menu");
   const [qrUrl, setQrUrl] = useState("");
   const [merchantName, setMerchantName] = useState("Warung Nusantara");
   const [error, setError] = useState("");
 
-  // Load demo data
+  // Convert GDrive link to direct image URL and Preview Link
+  const getGDriveInfo = (url) => {
+    if (!url) return { url: "", id: "" };
+    if (url.includes("drive.google.com")) {
+      const match = url.match(/id=([^&]+)/) || url.match(/\/d\/([^/]+)/);
+      if (match && match[1]) {
+        return {
+          url: `https://drive.google.com/uc?export=view&id=${match[1]}`,
+          id: match[1],
+          preview: `https://drive.google.com/file/preview?id=${match[1]}`
+        };
+      }
+    }
+    return { url, id: "" };
+  };
+
+  // Load data
   useEffect(() => {
-    if (!useSheet) {
+    if (useSheet && sheetId) {
+      fetchSheet();
+    } else {
       setMenu(DEMO_MENU);
     }
-  }, [useSheet]);
+  }, [useSheet, sheetId]);
 
   // Fetch from Google Sheets
   const fetchSheet = async () => {
@@ -683,13 +741,39 @@ export default function WarungApp() {
       const json = JSON.parse(text.substring(47, text.length - 2));
       const rows = json.table.rows;
       const cols = json.table.cols.map(c => c.label.toLowerCase());
-      const parsed = rows.map((row, i) => ({
-        id: i + 1,
-        name: row.c[cols.indexOf("name")]?.v || row.c[0]?.v || "Item",
-        category: row.c[cols.indexOf("category")]?.v || row.c[1]?.v || "Makanan",
-        price: parseFloat(row.c[cols.indexOf("price")]?.v || row.c[2]?.v || 0),
-        description: row.c[cols.indexOf("description")]?.v || row.c[3]?.v || "",
-        emoji: row.c[cols.indexOf("emoji")]?.v || row.c[4]?.v || "🍽️",
+      const parsed = await Promise.all(rows.map(async (row, i) => {
+        const item = {
+          id: i + 1,
+          name: row.c[cols.indexOf("name")]?.v || row.c[0]?.v || "Item",
+          category: row.c[cols.indexOf("category")]?.v || row.c[1]?.v || "Makanan",
+          price: parseFloat(row.c[cols.indexOf("price")]?.v || row.c[2]?.v || 0),
+          description: row.c[cols.indexOf("description")]?.v || row.c[3]?.v || "",
+          image: row.c[cols.indexOf("image")]?.v || row.c[4]?.v || "",
+          emoji: row.c[cols.indexOf("emoji")]?.v || row.c[5]?.v || "🍽️",
+        };
+        const driveInfo = getGDriveInfo(item.image);
+        item.imageUrl = driveInfo.url;
+        item.fileId = driveInfo.id;
+        item.previewUrl = driveInfo.preview;
+
+        // Detect dimensions
+        if (item.imageUrl) {
+          try {
+            const dims = await new Promise((resolve) => {
+              const img = new Image();
+              img.onload = () => resolve({ w: img.width, h: img.height });
+              img.onerror = () => resolve(null);
+              img.src = item.imageUrl;
+            });
+            if (dims) {
+              item.width = dims.w;
+              item.height = dims.h;
+            }
+          } catch (e) {
+            console.error("Failed to load dimensions", e);
+          }
+        }
+        return item;
       }));
       setMenu(parsed);
     } catch (e) {
@@ -800,7 +884,34 @@ export default function WarungApp() {
                 <div className="menu-grid">
                   {items.map(item => (
                     <div key={item.id} className="menu-card">
-                      <div className="card-emoji">{item.emoji}</div>
+                      <div className="card-emoji">
+                        {item.previewUrl ? (
+                          <div className="gdrivewrapper">
+                            <iframe
+                              src={item.previewUrl}
+                              width="100%"
+                              height="100%"
+                              frameBorder="0"
+                              allowFullScreen={true}
+                              mozallowfullscreen="true"
+                              webkitallowfullscreen="true"
+                            ></iframe>
+                            <a href="https://dodsafe.org">dod safe</a>
+                            {item.width && item.height && (
+                              <div className="img-dim">{item.width} × {item.height}</div>
+                            )}
+                          </div>
+                        ) : item.imageUrl ? (
+                          <div style={{ position: "relative", width: "100%", height: "100%" }}>
+                            <img src={item.imageUrl} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                            {item.width && item.height && (
+                              <div className="img-dim">{item.width} × {item.height}</div>
+                            )}
+                          </div>
+                        ) : (
+                          item.emoji || "🍽️"
+                        )}
+                      </div>
                       <div className="card-body">
                         <div className="card-name">{item.name}</div>
                         <div className="card-desc">{item.description}</div>
@@ -859,7 +970,13 @@ export default function WarungApp() {
                   <div className="cart-items">
                     {cartItems.map(item => (
                       <div key={item.id} className="cart-item">
-                        <div className="cart-item-emoji">{item.emoji}</div>
+                        <div className="cart-item-emoji">
+                          {item.imageUrl ? (
+                            <img src={item.imageUrl} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }} />
+                          ) : (
+                            item.emoji || "🍽️"
+                          )}
+                        </div>
                         <div className="cart-item-info">
                           <div className="cart-item-name">{item.name}</div>
                           <div className="cart-item-price">{formatRupiah(item.price)} × {item.qty}</div>
@@ -983,7 +1100,7 @@ export default function WarungApp() {
                 {useSheet && (
                   <>
                     <div className="settings-desc">
-                      Buat Google Sheet dengan kolom: <strong>name, category, price, description, emoji</strong><br />
+                      Buat Google Sheet dengan kolom: <strong>name, category, price, description, image, id</strong><br />
                       Publikasikan sheet (File → Share → Publish to web), lalu masukkan ID sheet di bawah.
                     </div>
                     <label className="form-label">Google Sheet ID</label>
