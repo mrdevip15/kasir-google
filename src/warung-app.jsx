@@ -177,7 +177,7 @@ const baseStyles = `
   .cart-btn { width: 100%; padding: 20px 28px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s; border: none; color: #fff; font-size: 18px; }
   .cart-badge { width: 30px; height: 30px; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #fff; color: inherit; }
   .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; backdrop-filter: blur(10px); }
-  .drawer { position: fixed; bottom: 0; left: 0; right: 0; z-index: 400; background: #fff; max-height: 85vh; overflow-y: auto; padding-bottom: env(safe-area-inset-bottom, 20px); }
+  .drawer { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 1024px; z-index: 400; background: #fff; max-height: 85vh; overflow-y: auto; padding-bottom: env(safe-area-inset-bottom, 20px); }
   .drawer-handle { width: 60px; height: 6px; border-radius: 3px; margin: 15px auto 0; background: rgba(0,0,0,0.05); }
   .drawer-header { padding: 30px; border-bottom: 3px dashed var(--border-dash); display: flex; align-items: center; justify-content: space-between; }
   .close-btn { width: 45px; height: 45px; border: none; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; background: transparent; color: inherit; }

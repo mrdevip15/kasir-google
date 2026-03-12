@@ -1,16 +1,76 @@
-# React + Vite
+# 🍱 Warung App: Smart Menu & QRIS Ordering System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A premium, highly-responsive web application for restaurants and "warungs" designed for seamless digital ordering. Built with React and Vite, this app allows customers to browse menus, add items to a cart, and pay instantly via QRIS.
 
-Currently, two official plugins are available:
+## ✨ Key Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+-   **Dual Theme System**: Switch between **🌸 Cute Kawaii** (pastel/soft) and **✨ Luxury Gold** (premium/dark) themes via the Admin Panel.
+-   **Dynamic Data Source**: Pull your menu directly from a **Google Sheet** or use built-in demo data.
+-   **Smart Menu Browsing**:
+    -   Categorized items (Makanan, Minuman, Dessert).
+    -   Real-time search functionality.
+    -   Image support with Google Drive preview integration.
+-   **Seamless Checkout**:
+    -   Persistent floating cart.
+    -   Integrated QRIS payment generator.
+    -   Order success tracking and customer/table identification.
+-   **Admin Settings**:
+    -   Instant theme switching.
+    -   Merchant name customization.
+    -   Google Sheet configuration (ID and Sheet Name).
+    -   Persistent settings saved to `localStorage`.
 
-## React Compiler
+## 🎨 Themes
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 🌸 Cute Kawaii
+Designed for cafes and sweet shops. Features:
+-   Pastel color palette (Pink, Cream, Brown).
+-   Playful typography (`Cherry Bomb One` & `Quicksand`).
+-   Dashed borders and soft, bouncy animations.
 
-## Expanding the ESLint configuration
+### ✨ Luxury Gold
+Designed for fine dining and high-end restaurants. Features:
+-   Dark mode aesthetic (Black & Gold).
+-   Elegant typography (`Playfair Display` & `DM Sans`).
+-   Sharp lines and premium gradients.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🚀 Getting Started
+
+### Prerequisites
+-   Node.js (v18+)
+-   npm or yarn
+
+### Installation
+1.  Clone the repository:
+    ```bash
+    git clone [repository-url]
+    cd kasir-google
+    ```
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+3.  Run the development server:
+    ```bash
+    npm run dev
+    ```
+
+## 📊 Google Sheets Integration
+
+To use your own menu:
+1.  Create a Google Sheet with the following headers in the first row:
+    `name`, `category`, `price`, `description`, `image`, `emoji`
+2.  Fill in your data.
+3.  Go to **File** > **Share** > **Publish to web**.
+4.  Copy the **Sheet ID** from the URL (the long string between `/d/` and `/edit`).
+5.  Open the **Admin Settings** (Gear icon ⚙) in the app, toggle to **Sheet**, and paste your ID.
+
+## 🛠 Tech Stack
+-   **React**: UI components and state management.
+-   **Vite**: Fast build tool and dev server.
+-   **FontAwesome**: Iconography.
+-   **Google Fonts**: Premium typography.
+-   **CSS Variables**: Theme orchestration.
+
+## 📄 License
+MIT License. Feel free to use and modify for your own business!
