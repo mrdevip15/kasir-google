@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 // ─── GOOGLE FONTS ────────────────────────────────────────────────────────────
 const fontLink = document.createElement("link");
 fontLink.rel = "stylesheet";
-fontLink.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap";
+fontLink.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=Quicksand:wght@400;500;600;700&family=Cherry+Bomb+One&display=swap";
 document.head.appendChild(fontLink);
 
 const faLink = document.createElement("link");
@@ -37,692 +37,185 @@ const formatRupiah = (n) =>
 
 // ─── QRIS Generator (demo QRIS string) ────────────────────────────────────────
 function generateQRIS(amount, merchantName = "Warung Nusantara") {
-  const amtStr = String(amount).padStart(13, "0");
-  // Demo QRIS-like string (not a real payment)
   return `00020101021226590014ID.CO.QRIS.WWW0118936009140000988880209QRISNUSANT5204581153033605802ID5916${merchantName.slice(0, 16).padEnd(16)}6013MAKASSAR6105902276304DEMO`;
 }
 
-// ─── STYLES ───────────────────────────────────────────────────────────────────
-const styles = `
+// ─── THEMES ───────────────────────────────────────────────────────────────────
+const THEMES = {
+  cute: `
+    :root {
+      --bg-color: #fff5f7;
+      --app-bg: #ffffff;
+      --text-main: #6d4c41;
+      --primary: #ff8fa3;
+      --primary-light: #ffcad4;
+      --accent: #ffe5ec;
+      --border-dash: #ffcad4;
+      --shadow: rgba(255,182,193,0.3);
+      --font-title: 'Cherry Bomb One', cursive;
+      --font-body: 'Quicksand', sans-serif;
+      --border-radius: 30px;
+      --card-border: #f8edeb;
+    }
+    body { background: var(--bg-color); color: var(--text-main); }
+    .app { font-family: var(--font-body); background: var(--app-bg); box-shadow: 0 10px 40px var(--shadow); border-radius: 0 0 40px 40px; }
+    .header { background: #fff; border-bottom: 3px dashed var(--border-dash); }
+    .header-title { font-family: var(--font-title); color: var(--primary); text-shadow: 3px 3px 0 var(--accent); font-size: 36px; }
+    .cat-btn { border: 2px solid var(--accent); background: #fff; color: var(--primary); border-radius: 25px; font-weight: 700; }
+    .cat-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 10px rgba(255,143,163,0.3); }
+    .search-input { border: 3px solid var(--card-border); border-radius: 30px; }
+    .search-input:focus { border-color: var(--primary-light); box-shadow: 0 0 15px rgba(255,202,212,0.2); }
+    .search-icon { color: #ffb6c1; }
+    .section-title { font-family: var(--font-title); color: #ffb6c1; font-size: 24px; }
+    .menu-card { background: #fff; border-radius: 30px; border: 3px solid var(--card-border); box-shadow: 0 4px 0 var(--card-border); }
+    .menu-card:hover { border-color: var(--primary-light); box-shadow: 0 10px 0 var(--primary-light); transform: translateY(-5px); }
+    .card-emoji { background: #fffafa; border-bottom: 3px solid var(--card-border); }
+    .img-dim { background: rgba(255,255,255,0.9); color: var(--primary); border: 2px solid var(--accent); border-radius: 15px; }
+    .card-name { font-weight: 700; color: var(--text-main); }
+    .card-price { font-family: var(--font-title); color: var(--primary); }
+    .add-btn { border-radius: 50%; background: var(--primary-light); color: #fff; }
+    .add-btn:hover { background: var(--primary); transform: scale(1.1) rotate(90deg); }
+    .qty-control { background: #fff5f7; border-radius: 25px; border: 2px solid var(--accent); }
+    .qty-btn { background: var(--primary-light); color: #fff; border-radius: 50%; }
+    .qty-btn:hover { background: var(--primary); }
+    .qty-num { color: var(--primary); font-weight: 700; }
+    .cart-btn { background: var(--primary); border: 4px solid #fff; border-radius: 40px; font-family: var(--font-title); box-shadow: 0 10px 25px rgba(255,143,163,0.4); }
+    .drawer { border-top: 8px solid var(--primary-light); border-radius: 40px 40px 0 0; }
+    .drawer-title { font-family: var(--font-title); color: var(--primary); }
+    .cart-item-emoji { background: #fff5f7; border: 3px solid var(--accent); border-radius: 20px; }
+    .order-summary { background: #fffafa; border-radius: 30px; border: 3px solid var(--card-border); }
+    .summary-row.total { font-family: var(--font-title); color: var(--primary); }
+    .pay-btn { background: var(--primary); border-radius: 30px; font-family: var(--font-title); box-shadow: 0 8px 20px rgba(255,143,163,0.3); }
+    .modal-content { border: 6px solid var(--primary-light); border-radius: 50px; }
+    .modal-title { font-family: var(--font-title); color: var(--primary); }
+    .qris-frame { background: #fff5f7; border: 4px dashed var(--primary-light); border-radius: 30px; }
+    .status-badge { background: #fff5f7; color: var(--primary); border: 3px solid var(--accent); border-radius: 30px; }
+    .confirm-btn { background: #12a855; border-radius: 30px; font-family: var(--font-title); width: 100%; color: #fff; }
+    .cancel-btn { border: 3px solid var(--card-border); border-radius: 30px; color: #d8c2c0; font-weight: 700; width: 100%; }
+    .admin-btn { position: fixed; top: 20px; right: 20px; z-index: 1000; background: var(--primary); color: #fff; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; box-shadow: 0 4px 15px var(--shadow); cursor: pointer; transition: all 0.3s; }
+    .admin-btn:hover { transform: rotate(90deg) scale(1.1); }
+  `,
+  luxury: `
+    :root {
+      --bg-color: #0c0b0a;
+      --app-bg: #11100f;
+      --text-main: #e0d5c1;
+      --primary: #d4af37;
+      --primary-light: rgba(212,175,55,0.4);
+      --accent: rgba(212,175,55,0.2);
+      --border-dash: rgba(212,175,55,0.2);
+      --shadow: rgba(0,0,0,0.8);
+      --font-title: 'Playfair Display', serif;
+      --font-body: 'DM Sans', sans-serif;
+      --border-radius: 0px;
+      --card-border: rgba(212,175,55,0.1);
+    }
+    body { background: var(--bg-color); color: var(--text-main); }
+    .app { font-family: var(--font-body); background: var(--app-bg); box-shadow: 0 0 60px var(--shadow); border-radius: 0; }
+    .header { background: linear-gradient(180deg, #1a1816 0%, #11100f 100%); border-bottom: 1px solid var(--border-dash); }
+    .header-title { font-family: var(--font-title); color: var(--primary); background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 32px; }
+    .cat-btn { border: none; background: transparent; color: #a3947a; border-radius: 0; text-transform: uppercase; letter-spacing: 1.5px; }
+    .cat-btn.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
+    .search-input { border: 1px solid var(--border-dash); border-radius: 0; background: rgba(255,255,255,0.03); color: var(--text-main); }
+    .search-input:focus { border-color: var(--primary); }
+    .search-icon { color: var(--primary); }
+    .section-title { font-family: var(--font-title); color: var(--primary); font-size: 20px; }
+    .menu-card { background: #1a1816; border-radius: 0; border: 1px solid var(--card-border); }
+    .menu-card:hover { border-color: var(--primary-light); box-shadow: 0 15px 40px rgba(0,0,0,0.6); transform: translateY(-5px); }
+    .card-emoji { background: #0c0b0a; border-bottom: none; }
+    .img-dim { background: rgba(12,11,10,0.8); color: var(--primary); border: 1px solid var(--border-dash); border-radius: 0; }
+    .card-name { font-family: var(--font-title); color: var(--text-main); }
+    .card-price { font-family: var(--font-body); color: var(--primary); }
+    .add-btn { border-radius: 0; background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+    .add-btn:hover { background: rgba(212,175,55,0.1); transform: scale(1.05); }
+    .qty-control { background: #1a1816; border-radius: 0; border: 1px solid var(--border-dash); }
+    .qty-btn { background: transparent; color: var(--primary); border: 1px solid var(--primary-light); border-radius: 0; }
+    .qty-btn:hover { background: rgba(212,175,55,0.1); }
+    .qty-num { color: var(--text-main); }
+    .cart-btn { background: linear-gradient(135deg, #1a1816, #0c0b0a); border: 1px solid var(--primary); border-radius: 0; font-family: var(--font-body); box-shadow: 0 15px 40px rgba(0,0,0,0.6); }
+    .drawer { background: #11100f; border-top: 1px solid var(--primary-light); border-radius: 0; }
+    .drawer-title { font-family: var(--font-title); color: var(--primary); }
+    .cart-item-emoji { background: #0c0b0a; border: 1px solid var(--card-border); border-radius: 0; }
+    .order-summary { background: #1a1816; border: 1px solid var(--card-border); border-radius: 0; }
+    .summary-row.total { font-family: var(--font-body); color: var(--primary); border-top: 1px solid var(--primary-light); }
+    .pay-btn { background: var(--primary); color: #0c0b0a; border-radius: 0; font-family: var(--font-body); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+    .modal-content { background: #11100f; border: 1px solid var(--primary); border-radius: 0; }
+    .modal-title { font-family: var(--font-title); color: var(--primary); }
+    .qris-frame { background: #1a1816; border: 1px solid var(--primary-light); border-radius: 0; }
+    .status-badge { color: var(--primary); border: 1px solid var(--border-dash); border-radius: 0; }
+    .confirm-btn { background: #12a855; border-radius: 0; font-family: var(--font-body); width: 100%; color: #fff; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+    .cancel-btn { background: transparent; border: 1px solid var(--primary-light); border-radius: 0; color: var(--primary); width: 100%; }
+    .admin-btn { position: fixed; top: 20px; right: 20px; z-index: 1000; background: rgba(212,175,55,0.1); color: var(--primary); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; transition: all 0.3s; }
+    .admin-btn:hover { transform: rotate(90deg) scale(1.1); background: rgba(212,175,55,0.2); }
+  `
+};
+
+const baseStyles = `
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0c0b0a; color: #e0d5c1; }
-
-  .app {
-    font-family: 'DM Sans', sans-serif;
-    background: #11100f;
-    min-height: 100vh;
-    position: relative;
-    overflow-x: hidden;
-    max-width: 1024px;
-    margin: 0 auto;
-    box-shadow: 0 0 60px rgba(0,0,0,0.8);
-    color: #e0d5c1;
-  }
-
-  /* HEADER */
-  .header {
-    background: linear-gradient(180deg, #1a1816 0%, #11100f 100%);
-    padding: 30px 24px 10px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    border-bottom: 1px solid rgba(212,175,55,0.2);
-  }
-  .header-top {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 24px;
-    text-align: center;
-  }
-  .header-title {
-    font-family: 'Playfair Display', serif;
-    color: #d4af37;
-    font-size: 32px;
-    font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: 1px;
-    background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  
-  /* CATEGORIES */
-  .categories {
-    display: flex;
-    gap: 12px;
-    padding-bottom: 10px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    justify-content: center;
-  }
-  .cat-btn {
-    padding: 8px 20px;
-    border-radius: 0;
-    border: none;
-    background: transparent;
-    color: #a3947a;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.3s;
-    flex-shrink: 0;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    position: relative;
-  }
-  .cat-btn::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 1px;
-    background: #d4af37;
-    transition: all 0.3s;
-    transform: translateX(-50%);
-  }
-  .cat-btn.active {
-    color: #d4af37;
-    font-weight: 600;
-  }
-  .cat-btn.active::after {
-    width: 30px;
-  }
-
-  /* SEARCH */
-  .search-wrap {
-    padding: 24px 24px 12px;
-    background: #11100f;
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-  .search-icon {
-    position: absolute;
-    left: 40px;
-    color: #d4af37;
-    font-size: 14px;
-    pointer-events: none;
-  }
-  .search-input {
-    width: 100%;
-    padding: 12px 20px 12px 40px;
-    border: 1px solid rgba(212,175,55,0.2);
-    border-radius: 0;
-    background: rgba(255,255,255,0.03);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: #e0d5c1;
-    outline: none;
-    transition: all 0.3s;
-  }
-  .search-input:focus { 
-    border-color: #d4af37; 
-    background: rgba(255,255,255,0.05);
-    box-shadow: 0 0 15px rgba(212,175,55,0.1);
-  }
-  .search-input::placeholder { color: #5a5449; }
-
-  /* MENU GRID */
-  .menu-section { padding: 10px 24px 120px; }
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    color: #d4af37;
-    font-size: 20px;
-    font-weight: 600;
-    margin: 30px 0 20px;
-    text-align: center;
-    position: relative;
-    padding-bottom: 15px;
-  }
-  .section-title::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #d4af37, transparent);
-  }
-
-  .menu-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 30px;
-  }
-
-  .menu-card {
-    background: #1a1816;
-    border-radius: 0;
-    overflow: hidden;
-    transition: transform 0.4s, box-shadow 0.4s;
-    cursor: pointer;
-    border: 1px solid rgba(212,175,55,0.1);
-    position: relative;
-  }
-  .menu-card:hover {
-    transform: translateY(-8px);
-    border-color: rgba(212,175,55,0.4);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-  }
-  .card-emoji {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 4rem;
-    background: #0c0b0a;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .img-dim {
-    position: absolute;
-    bottom: 12px;
-    right: 12px;
-    background: rgba(12,11,10,0.8);
-    color: #d4af37;
-    padding: 3px 8px;
-    font-size: 9px;
-    z-index: 10;
-    letter-spacing: 1px;
-    border: 1px solid rgba(212,175,55,0.2);
-  }
-  .card-body { padding: 20px; background: #1a1816; }
-  .card-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 18px;
-    font-weight: 600;
-    color: #e0d5c1;
-    margin-bottom: 8px;
-    line-height: 1.3;
-  }
-  .card-desc {
-    font-size: 12px;
-    color: #8a8171;
-    margin-bottom: 20px;
-    line-height: 1.6;
-    min-height: 38px;
-    font-weight: 300;
-  }
-  .card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-top: 1px solid rgba(212,175,55,0.1);
-    padding-top: 15px;
-  }
-  .card-price {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    color: #d4af37;
-    letter-spacing: 0.5px;
-  }
-  .add-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 0;
-    background: transparent;
-    border: 1px solid #d4af37;
-    color: #d4af37;
-    font-size: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.15s;
-    line-height: 1;
-    padding-bottom: 1px;
-  }
-  .add-btn:hover { transform: scale(1.1); }
-
-  .qty-control {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .qty-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 0;
-    border: 1px solid rgba(212,175,55,0.4);
-    background: transparent;
-    color: #d4af37;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 300;
-    transition: all 0.2s;
-  }
-  .qty-btn:hover { background: rgba(212,175,55,0.1); }
-  .qty-num {
-    font-size: 14px;
-    font-weight: 500;
-    color: #e0d5c1;
-    min-width: 20px;
-    text-align: center;
-  }
-
-  /* FLOATING CART */
-  .cart-float {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 200;
-    width: calc(100% - 48px);
-    max-width: 440px;
-  }
-  .cart-btn {
-    width: 100%;
-    padding: 18px 24px;
-    background: linear-gradient(135deg, #1a1816, #0c0b0a);
-    border: 1px solid #d4af37;
-    border-radius: 0;
-    color: #d4af37;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-    transition: all 0.3s;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-  }
-  .cart-btn:hover { background: #1a1816; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
-  .cart-badge {
-    background: #d4af37;
-    color: #0c0b0a;
-    width: 24px;
-    height: 24px;
-    border-radius: 0;
-    font-size: 12px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* OVERLAY */
-  .overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.8);
-    z-index: 300;
-    backdrop-filter: blur(8px);
-    animation: fadeIn 0.3s ease;
-  }
-  @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-
-  /* DRAWER */
-  .drawer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 400;
-    background: #11100f;
-    border-top: 1px solid rgba(212,175,55,0.3);
-    max-height: 85vh;
-    overflow-y: auto;
-    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    padding-bottom: env(safe-area-inset-bottom, 20px);
-  }
-  @keyframes slideUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
-  .drawer-handle {
-    width: 40px;
-    height: 1px;
-    background: rgba(212,175,55,0.3);
-    margin: 15px auto 0;
-  }
-  .drawer-header {
-    padding: 24px;
-    border-bottom: 1px solid rgba(212,175,55,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .drawer-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 24px;
-    font-weight: 700;
-    color: #d4af37;
-    letter-spacing: 1px;
-  }
-  .close-btn {
-    width: 40px;
-    height: 40px;
-    border: none;
-    background: transparent;
-    color: #d4af37;
-    font-size: 24px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-  }
-  .close-btn:hover { transform: rotate(90deg); }
-
-  /* CART ITEMS */
-  .cart-items { padding: 20px 0; }
-  .cart-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 15px 24px;
-    border-bottom: 1px solid rgba(212,175,55,0.05);
-  }
-  .cart-item-emoji {
-    width: 60px;
-    height: 60px;
-    background: #0c0b0a;
-    border: 1px solid rgba(212,175,55,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    flex-shrink: 0;
-  }
+  .app { min-height: 100vh; position: relative; overflow-x: hidden; max-width: 1024px; margin: 0 auto; }
+  .header { padding: 25px 24px 15px; position: sticky; top: 0; z-index: 100; }
+  .header-top { display: flex; align-items: center; justify-content: center; margin-bottom: 20px; text-align: center; }
+  .categories { display: flex; gap: 10px; padding-bottom: 5px; overflow-x: auto; scrollbar-width: none; justify-content: center; }
+  .cat-btn { padding: 8px 22px; cursor: pointer; white-space: nowrap; transition: all 0.3s; flex-shrink: 0; font-size: 14px; }
+  .search-wrap { padding: 20px 24px 10px; position: relative; display: flex; align-items: center; }
+  .search-icon { position: absolute; left: 42px; font-size: 16px; pointer-events: none; }
+  .search-input { width: 100%; padding: 14px 20px 14px 45px; outline: none; transition: all 0.3s; font-size: 15px; }
+  .menu-section { padding: 10px 20px 120px; }
+  .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+  .menu-card { overflow: hidden; transition: all 0.4s; cursor: pointer; position: relative; }
+  .card-emoji { width: 100%; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; font-size: 4rem; position: relative; overflow: hidden; }
+  .img-dim { position: absolute; bottom: 15px; right: 15px; padding: 4px 10px; font-size: 10px; z-index: 10; font-weight: 700; }
+  .card-body { padding: 22px; }
+  .card-name { font-size: 20px; margin-bottom: 8px; line-height: 1.3; }
+  .card-desc { font-size: 13px; margin-bottom: 20px; line-height: 1.5; min-height: 40px; }
+  .card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 15px; border-top: 2px dashed #f8edeb; }
+  .add-btn { width: 40px; height: 40px; border: none; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; line-height: 1; padding-bottom: 4px; }
+  .qty-control { display: flex; align-items: center; gap: 12px; padding: 5px 12px; }
+  .qty-btn { width: 30px; height: 30px; border: none; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.2s; }
+  .qty-num { font-size: 16px; min-width: 20px; text-align: center; }
+  .cart-float { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 200; width: calc(100% - 40px); max-width: 440px; }
+  .cart-btn { width: 100%; padding: 20px 28px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s; border: none; color: #fff; font-size: 18px; }
+  .cart-badge { width: 30px; height: 30px; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #fff; color: inherit; }
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; backdrop-filter: blur(10px); }
+  .drawer { position: fixed; bottom: 0; left: 0; right: 0; z-index: 400; background: #fff; max-height: 85vh; overflow-y: auto; padding-bottom: env(safe-area-inset-bottom, 20px); }
+  .drawer-handle { width: 60px; height: 6px; border-radius: 3px; margin: 15px auto 0; background: rgba(0,0,0,0.05); }
+  .drawer-header { padding: 30px; border-bottom: 3px dashed var(--border-dash); display: flex; align-items: center; justify-content: space-between; }
+  .close-btn { width: 45px; height: 45px; border: none; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; background: transparent; color: inherit; }
+  .cart-item { display: flex; align-items: center; gap: 15px; padding: 15px 30px; border-bottom: 2px dashed var(--border-dash); }
+  .cart-item-emoji { width: 65px; height: 65px; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
   .cart-item-info { flex: 1 }
-  .cart-item-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 16px;
-    font-weight: 600;
-    color: #e0d5c1;
-    margin-bottom: 4px;
-  }
-  .cart-item-price {
-    font-size: 13px;
-    color: #d4af37;
-    font-weight: 500;
-  }
+  .cart-item-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .order-summary { padding: 25px 30px; margin: 15px 20px; }
+  .summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 15px; font-weight: 600; }
+  .customer-form { padding: 25px 30px; }
+  .form-label { font-size: 14px; font-weight: 700; margin-bottom: 10px; display: block; }
+  .form-input { width: 100%; padding: 15px 20px; border: 1px solid var(--border-dash); border-radius: 20px; font-size: 16px; margin-bottom: 25px; outline: none; background: transparent; color: inherit; }
+  .pay-btn { width: 100%; padding: 22px; border: none; font-size: 20px; cursor: pointer; color: #fff; }
+  .modal { position: fixed; inset: 0; z-index: 500; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .modal-content { padding: 45px 35px; width: 100%; max-width: 460px; text-align: center; position: relative; background: #fff; }
+  .qris-frame { padding: 25px; display: inline-block; margin-bottom: 30px; }
+  .gdrivewrapper { background: #fff; position: relative; width: 100%; height: 100%; overflow: hidden; }
+  .gdrivewrapper iframe { border: 0; position: absolute; top: -50px; left: 0; width: 100%; height: calc(100% + 100px); z-index: 2; }
+  .gdrive-overlay { position: absolute; inset: 0; z-index: 5; background: transparent; }
+  .loading { text-align: center; padding: 40px; font-weight: 700; opacity: 0.7; }
+  .success-wrap { padding: 40px 20px; text-align: center; }
+  .success-icon { font-size: 64px; margin-bottom: 20px; }
+  .success-title { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+  .success-text { font-size: 16px; opacity: 0.8; margin-bottom: 30px; }
+  .new-order-btn { padding: 15px 40px; border-radius: 30px; border: none; background: var(--primary); color: #fff; font-size: 18px; font-weight: 700; cursor: pointer; }
 
-  /* ORDER SUMMARY */
-  .order-summary {
-    padding: 24px;
-    background: #1a1816;
-    border-top: 1px solid rgba(212,175,55,0.1);
-    border-bottom: 1px solid rgba(212,175,55,0.1);
-    margin: 10px 0;
-  }
-  .summary-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    font-size: 14px;
-    color: #8a8171;
-  }
-  .summary-row.total {
-    font-size: 18px;
-    font-weight: 700;
-    color: #d4af37;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid rgba(212,175,55,0.2);
-    margin-bottom: 0;
-    letter-spacing: 0.5px;
-  }
-
-  /* CUSTOMER FORM */
-  .customer-form { padding: 24px; }
-  .form-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: #d4af37;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-    display: block;
-  }
-  .form-input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1px solid rgba(212,175,55,0.2);
-    border-radius: 0;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    color: #e0d5c1;
-    margin-bottom: 20px;
-    outline: none;
-    background: rgba(255,255,255,0.03);
-    transition: all 0.3s;
-  }
-  .form-input:focus { border-color: #d4af37; background: rgba(255,255,255,0.05); }
-
-  .pay-btn {
-    width: 100%;
-    padding: 20px;
-    background: #d4af37;
-    border: none;
-    border-radius: 0;
-    color: #0c0b0a;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    transition: all 0.3s;
-  }
-  .pay-btn:hover { background: #fcf6ba; transform: translateY(-2px); }
-
-  /* PAYMENT MODAL */
-  .modal {
-    position: fixed;
-    inset: 0;
-    z-index: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  .modal-content {
-    background: #11100f;
-    border: 1px solid #d4af37;
-    padding: 40px 30px;
-    width: 100%;
-    max-width: 440px;
-    animation: fadeIn 0.4s ease;
-    text-align: center;
-    box-shadow: 0 30px 100px rgba(0,0,0,0.9);
-  }
-  .modal-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 26px;
-    font-weight: 700;
-    color: #d4af37;
-    margin-bottom: 8px;
-  }
-  .modal-subtitle { font-size: 14px; color: #8a8171; margin-bottom: 30px; }
-  .qris-frame {
-    background: #1a1816;
-    border: 1px solid rgba(212,175,55,0.3);
-    padding: 20px;
-    display: inline-block;
-    margin-bottom: 24px;
-  }
-  .qris-inner {
-    background: #fff;
-    padding: 10px;
-  }
-  .qris-img { width: 220px; height: 220px; display: block; }
-  .qris-label {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 15px;
-    color: #d4af37;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-  }
-  .amount-display {
-    font-family: 'Playfair Display', serif;
-    font-size: 32px;
-    font-weight: 700;
-    color: #e0d5c1;
-    margin-bottom: 8px;
-  }
-  .amount-label { font-size: 12px; color: #8a8171; margin-bottom: 30px; }
-  .status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border: 1px solid rgba(212,175,55,0.2);
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 24px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  .status-waiting { color: #d4af37; }
-  .status-paid { background: rgba(10,122,61,0.2); color: #12a855; border-color: #12a855; }
-  
-  .confirm-btn {
-    width: 100%;
-    padding: 18px;
-    background: #12a855;
-    color: #fff;
-    border: none;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-  }
-  .cancel-btn {
-    width: 100%;
-    padding: 15px;
-    background: transparent;
-    border: 1px solid rgba(212,175,55,0.3);
-    color: #d4af37;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  /* SETTINGS PANEL */
-  .settings-content { padding: 16px 24px 24px; }
-  .settings-desc { font-size: 13px; color: #9a7a5a; margin-bottom: 16px; line-height: 1.6; }
-  .settings-desc a { color: #8b3a0f; }
-  .mode-toggle {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-  .mode-btn {
-    flex: 1;
-    padding: 10px;
-    border-radius: 10px;
-    border: 1.5px solid #e8d4b8;
-    background: #fff;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    color: #6b4423;
-    transition: all 0.2s;
-  }
-  .mode-btn.active {
-    background: #3d1a00;
-    color: #f5d49c;
-    border-color: #3d1a00;
-  }
-  .save-btn {
-    width: 100%;
-    padding: 12px;
-    background: #3d1a00;
-    border: none;
-    border-radius: 12px;
-    color: #f5d49c;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  /* SUCCESS */
-  .success-wrap { text-align: center; padding: 20px 24px 32px; }
-  .success-icon { font-size: 64px; margin-bottom: 12px; }
-  .success-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 24px;
-    font-weight: 700;
-    color: #3d1a00;
-    margin-bottom: 6px;
-  }
-  .success-text { font-size: 14px; color: #9a7a5a; margin-bottom: 24px; line-height: 1.6; }
-  .new-order-btn {
-    padding: 14px 32px;
-    background: linear-gradient(135deg, #3d1a00, #8b3a0f);
-    border: none;
-    border-radius: 14px;
-    color: #f5d49c;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  /* EMPTY */
-  .empty-cart { text-align: center; padding: 40px 24px; color: #c9956a; }
-  .empty-cart-icon { font-size: 48px; margin-bottom: 8px; }
-  .empty-cart-text { font-size: 14px; }
-  .loading { text-align: center; padding: 40px; color: #c9956a; font-size: 14px; }
-
-  /* GDRIVE WRAPPER */
-  .gdrivewrapper {
-    background: #fff;
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
-  .gdrivewrapper iframe {
-    border: 0;
-    position: absolute;
-    top: -50px;
-    left: 0;
-    width: 100%;
-    height: calc(100% + 100px);
-    z-index: 2;
-  }
-  .gdrive-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 5;
-    background: transparent;
-  }
-  .gdrivewrapper a {
-    color: rgba(0,0,0,0);
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 0;
-  }
+  /* Admin Panel Specific */
+  .admin-panel-content { padding: 20px; }
+  .theme-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+  .theme-card { padding: 20px; border: 3px solid var(--accent); border-radius: 20px; cursor: pointer; transition: all 0.3s; text-align: center; }
+  .theme-card.active { border-color: var(--primary); background: var(--accent); }
+  .theme-card i { font-size: 24px; margin-bottom: 10px; display: block; }
+  .theme-card span { font-weight: 700; font-size: 14px; }
 `;
 
 // ─── MAIN APP ────────────────────────────────────────────────────────────────
 export default function WarungApp() {
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "cute");
   const [menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState("Semua");
@@ -740,6 +233,13 @@ export default function WarungApp() {
   const [qrUrl, setQrUrl] = useState("");
   const [merchantName, setMerchantName] = useState("Warung Nusantara");
   const [error, setError] = useState("");
+
+  const activeStyles = baseStyles + THEMES[theme];
+
+  // Save theme to local storage
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   // Convert GDrive link to direct image URL and Preview Link
   const getGDriveInfo = (url) => {
@@ -848,9 +348,7 @@ export default function WarungApp() {
     return catMatch && searchMatch;
   };
 
-  const menuCategories = ["Makanan", "Minuman", "Dessert"];
-
-  const handlePay = () => {
+  const handePay = () => {
     if (!customer.name || !customer.table) return;
     const qris = generateQRIS(total, merchantName);
     const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qris)}&margin=0`;
@@ -876,17 +374,22 @@ export default function WarungApp() {
     setSearch("");
   };
 
+  const menuCategoriesSorted = ["Makanan", "Minuman", "Dessert"];
+
   return (
     <>
-      <style>{styles}</style>
+      <style>{activeStyles}</style>
       <div className="app">
+
+        {/* ADMIN BUTTON */}
+        <button className="admin-btn" onClick={() => setShowSettings(true)}>
+          <i className="fa-solid fa-gear"></i>
+        </button>
 
         {/* HEADER */}
         <div className="header">
           <div className="header-top">
-            <div>
-              <div className="header-title">{merchantName}</div>
-            </div>
+            <div className="header-title">{merchantName}</div>
           </div>
           <div className="categories">
             {CATEGORIES.map(cat => (
@@ -906,7 +409,7 @@ export default function WarungApp() {
         {/* MENU */}
         <div className="menu-section">
           {loading && <div className="loading">⏳ Memuat menu...</div>}
-          {!loading && menuCategories.map(grp => {
+          {!loading && menuCategoriesSorted.map(grp => {
             const grpItems = menu.filter(i => i.category === grp);
             if (!grpItems.length) return null;
 
@@ -1039,7 +542,7 @@ export default function WarungApp() {
                     <label className="form-label">Nomor Meja</label>
                     <input className="form-input" placeholder="Contoh: Meja 5"
                       value={customer.table} onChange={e => setCustomer(c => ({ ...c, table: e.target.value }))} />
-                    <button className="pay-btn" onClick={handlePay}
+                    <button className="pay-btn" onClick={handePay}
                       disabled={!customer.name || !customer.table}
                       style={{ opacity: (!customer.name || !customer.table) ? 0.5 : 1 }}>
                       💳 Bayar dengan QRIS — {formatRupiah(total)}
@@ -1060,19 +563,15 @@ export default function WarungApp() {
                 {!paymentConfirmed ? (
                   <>
                     <div className="modal-title">Scan QRIS</div>
-                    <div className="modal-subtitle">Scan QR Code di bawah untuk membayar</div>
                     <div className="qris-frame">
                       <div className="qris-inner">
                         <img src={qrUrl} alt="QRIS QR Code" className="qris-img"
                           onError={e => { e.target.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=DEMO-QRIS-${total}&margin=0`; }} />
                       </div>
-                      <div className="qris-label">
-                        <span>⬛</span> QRIS <span>⬛</span>
-                      </div>
                     </div>
                     <div className="amount-display">{formatRupiah(total)}</div>
                     <div className="amount-label">a.n. {customer.name} · {customer.table}</div>
-                    <div className="status-badge status-waiting">⏳ Menunggu Pembayaran...</div>
+                    <div className="status-badge">⏳ Menunggu Pembayaran...</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 8, width: "100%" }}>
                       <button className="confirm-btn" onClick={handleConfirmPayment}>✓ Konfirmasi Sudah Bayar</button>
                       <button className="cancel-btn" onClick={() => setShowPayment(false)}>Batalkan</button>
@@ -1080,7 +579,7 @@ export default function WarungApp() {
                   </>
                 ) : (
                   <div style={{ padding: "20px 0" }}>
-                    <div style={{ fontSize: 56, marginBottom: 12 }}>✅</div>
+                    <div className="success-icon">✅</div>
                     <div className="modal-title">Memproses...</div>
                   </div>
                 )}
@@ -1091,64 +590,71 @@ export default function WarungApp() {
 
         {/* SUCCESS */}
         {showSuccess && (
-          <>
-            <div className="overlay" />
-            <div className="drawer" style={{ borderRadius: "24px 24px 0 0" }}>
-              <div className="drawer-handle" />
-              <div className="success-wrap">
-                <div className="success-icon">🎉</div>
-                <div className="success-title">Pembayaran Berhasil!</div>
-                <div className="success-text">
-                  Terima kasih, <strong>{customer.name}</strong>!<br />
-                  Pesanan Anda sedang diproses. Silakan tunggu di {customer.table}.
+          <div className="overlay" onClick={resetAll}>
+            <div className="modal">
+              <div className="modal-content">
+                <div className="success-wrap">
+                  <div className="success-icon">🎉</div>
+                  <div className="success-title">Pembayaran Berhasil!</div>
+                  <div className="success-text">
+                    Terima kasih, <strong>{customer.name}</strong>!<br />
+                    Pesanan Anda sedang diproses. Silakan tunggu di {customer.table}.
+                  </div>
+                  <button className="new-order-btn" onClick={resetAll}>+ Pesan Lagi</button>
                 </div>
-                <button className="new-order-btn" onClick={resetAll}>+ Pesan Lagi</button>
               </div>
             </div>
-          </>
+          </div>
         )}
 
-        {/* SETTINGS */}
+        {/* ADMIN SETTINGS */}
         {showSettings && (
           <>
             <div className="overlay" onClick={() => setShowSettings(false)} />
             <div className="drawer">
               <div className="drawer-handle" />
               <div className="drawer-header">
-                <div className="drawer-title">⚙ Pengaturan</div>
+                <div className="drawer-title">⚙ Pengaturan Admin</div>
                 <button className="close-btn" onClick={() => setShowSettings(false)}>✕</button>
               </div>
-              <div className="settings-content">
-                <label className="form-label">Nama Warung / Restoran</label>
-                <input className="form-input" placeholder="Warung Nusantara"
-                  value={merchantName} onChange={e => setMerchantName(e.target.value)} />
-
-                <label className="form-label" style={{ marginBottom: 8 }}>Sumber Data Menu</label>
-                <div className="mode-toggle">
-                  <button className={`mode-btn ${!useSheet ? "active" : ""}`} onClick={() => setUseSheet(false)}>
-                    📋 Demo Data
-                  </button>
-                  <button className={`mode-btn ${useSheet ? "active" : ""}`} onClick={() => setUseSheet(true)}>
-                    📊 Google Sheet
-                  </button>
+              <div className="admin-panel-content">
+                <div className="setting-item">
+                  <label className="form-label">Pilih Tema</label>
+                  <div className="theme-selector">
+                    <div className={`theme-card ${theme === 'cute' ? 'active' : ''}`} onClick={() => setTheme('cute')}>
+                      <i className="fa-solid fa-face-smile" style={{ color: '#ff8fa3' }}></i>
+                      <span>Cute Kawaii</span>
+                    </div>
+                    <div className={`theme-card ${theme === 'luxury' ? 'active' : ''}`} onClick={() => setTheme('luxury')}>
+                      <i className="fa-solid fa-crown" style={{ color: '#d4af37' }}></i>
+                      <span>Luxury Gold</span>
+                    </div>
+                  </div>
                 </div>
 
-                {useSheet && (
-                  <>
-                    <div className="settings-desc">
-                      Buat Google Sheet dengan kolom: <strong>name, category, price, description, image, id</strong><br />
-                      Publikasikan sheet (File → Share → Publish to web), lalu masukkan ID sheet di bawah.
-                    </div>
-                    <label className="form-label">Google Sheet ID</label>
-                    <input className="form-input" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"
-                      value={sheetId} onChange={e => setSheetId(e.target.value)} />
-                    <label className="form-label">Nama Sheet</label>
-                    <input className="form-input" placeholder="Menu"
-                      value={sheetName} onChange={e => setSheetName(e.target.value)} />
-                    {error && <div style={{ color: "#c0392b", fontSize: 13, marginBottom: 12, padding: "8px 12px", background: "#fdf0ed", borderRadius: 8 }}>{error}</div>}
-                  </>
-                )}
-                <button className="save-btn" onClick={saveSettings}>💾 Simpan & Terapkan</button>
+                <div className="setting-item" style={{ marginTop: '30px' }}>
+                  <label className="form-label">Nama Warung</label>
+                  <input className="form-input" placeholder="Warung Nusantara"
+                    value={merchantName} onChange={e => setMerchantName(e.target.value)} />
+                </div>
+
+                <div className="setting-item">
+                  <label className="form-label">Sumber Data</label>
+                  <div style={{ display: 'flex', gap: 10, marginBottom: 15 }}>
+                    <button className={`cat-btn ${!useSheet ? "active" : ""}`} onClick={() => setUseSheet(false)} style={{ flex: 1 }}>Demo</button>
+                    <button className={`cat-btn ${useSheet ? "active" : ""}`} onClick={() => setUseSheet(true)} style={{ flex: 1 }}>Sheet</button>
+                  </div>
+                  {useSheet && (
+                    <>
+                      <label className="form-label">Sheet ID</label>
+                      <input className="form-input" value={sheetId} onChange={e => setSheetId(e.target.value)} />
+                      <label className="form-label">Nama Sheet</label>
+                      <input className="form-input" value={sheetName} onChange={e => setSheetName(e.target.value)} />
+                    </>
+                  )}
+                </div>
+                
+                <button className="pay-btn" onClick={saveSettings} style={{ marginTop: '20px' }}>💾 Simpan Perubahan</button>
               </div>
             </div>
           </>
