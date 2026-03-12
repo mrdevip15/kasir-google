@@ -48,6 +48,9 @@ const styles = `
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
+    max-width: 1024px;
+    margin: 0 auto;
+    box-shadow: 0 0 40px rgba(0,0,0,0.5);
   }
 
   /* HEADER */
@@ -172,9 +175,8 @@ const styles = `
 
   .menu-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, 640px);
-    gap: 24px;
-    justify-content: center;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
   }
 
   .menu-card {
@@ -185,19 +187,18 @@ const styles = `
     transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
     border: 1.5px solid #f0e4d0;
-    width: 640px;
   }
   .menu-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(61,26,0,0.14);
   }
   .card-emoji {
-    width: 640px;
-    height: 640px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 64px;
+    font-size: 4rem;
     background: linear-gradient(135deg, #fff8f0, #fdebd0);
     position: relative;
     overflow: hidden;
