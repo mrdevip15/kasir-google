@@ -814,15 +814,13 @@ export default function WarungApp() {
   const tax = Math.round(subtotal * 0.1);
   const total = subtotal + tax;
 
-  const filteredMenu = menu.filter(item => {
+  const isItemVisible = (item) => {
     const catMatch = category === "Semua" || item.category === category;
     const searchMatch = item.name.toLowerCase().includes(search.toLowerCase());
     return catMatch && searchMatch;
-  });
+  };
 
-  const categoryGroups = category === "Semua"
-    ? ["Makanan", "Minuman", "Dessert"]
-    : [category];
+  const menuCategories = ["Makanan", "Minuman", "Dessert"];
 
   const handlePay = () => {
     if (!customer.name || !customer.table) return;
@@ -884,15 +882,20 @@ export default function WarungApp() {
         {/* MENU */}
         <div className="menu-section">
           {loading && <div className="loading">⏳ Memuat menu...</div>}
-          {!loading && categoryGroups.map(grp => {
-            const items = filteredMenu.filter(i => i.category === grp);
-            if (!items.length) return null;
+          {!loading && menuCategories.map(grp => {
+            const grpItems = menu.filter(i => i.category === grp);
+            if (!grpItems.length) return null;
+            
+            const isGroupInFilter = category === "Semua" || category === grp;
+            const hasVisibleItems = grpItems.some(isItemVisible);
+            const showGroup = isGroupInFilter && hasVisibleItems;
+
             return (
-              <div key={grp}>
+              <div key={grp} style={{ display: showGroup ? 'block' : 'none' }}>
                 <div className="section-title">{grp}</div>
                 <div className="menu-grid">
-                  {items.map(item => (
-                    <div key={item.id} className="menu-card">
+                  {grpItems.map(item => (
+                    <div key={item.id} className="menu-card" style={{ display: isItemVisible(item) ? 'block' : 'none' }}>
                       <div className="card-emoji">
                         {item.previewUrl ? (
                           <div className="gdrivewrapper">
